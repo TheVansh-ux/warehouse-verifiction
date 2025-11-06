@@ -178,7 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 10); // A small delay to allow the element to be in the DOM first
 
         // 2. Set timer to remove the toast
-        setTimeout(()_ => {
+        setTimeout(() => {
             toast.classList.remove('show'); // Trigger "hide" animation
 
             // 3. Remove from DOM after animation finishes
