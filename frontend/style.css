@@ -83,13 +83,13 @@ body {
 /* --- Content Grid (for responsive layout) --- */
 .content-grid {
     display: grid;
-    grid-template-columns: 1fr; /* Single column on small screens */
+    grid-template-columns: 1fr; /* Default: Single column for mobile */
     gap: 2.5rem;
 }
 
-@media (min-width: 992px) { /* Two columns on larger screens */
+@media (min-width: 992px) { /* Switch to two columns on larger screens */
     .content-grid {
-        grid-template-columns: 1fr 2fr; /* Scan card smaller than dashboard */
+        grid-template-columns: 1fr 2fr; 
     }
 }
 
