@@ -124,7 +124,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const resultText = scan.result === 1 ? 'Match' : 'No Match';
                 const resultIcon = scan.result === 1 ? '<i class="fa-solid fa-check"></i>' : '<i class="fa-solid fa-xmark"></i>';
                 const resultClass = scan.result === 1 ? 'result-match' : 'result-no-match';
-                const timestamp = new Date(scan.created.at).toLocaleString('sv-SE', {
+                
+                // 👇 This line was fixed 👇
+                const timestamp = new Date(scan.created_at).toLocaleString('sv-SE', {
                     year: 'numeric',
                     month: '2-digit',
                     day: '2-digit',
