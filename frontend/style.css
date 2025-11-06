@@ -1,0 +1,282 @@
+/* --- Global Styles & Variables --- */
+:root {
+    --primary-color: #3B82F6; /* A clean blue, inspired by the image */
+    --primary-dark: #2563EB;
+    --background-color: #F8FAFC; /* Light gray background */
+    --card-background: #FFFFFF;
+    --text-color-dark: #1F2937;
+    --text-color-medium: #4B5563;
+    --text-color-light: #6B7280;
+    --border-color: #E5E7EB;
+    --success-color: #10B981; /* Green */
+    --error-color: #EF4444;   /* Red */
+    --shadow-light: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.05);
+    --shadow-medium: 0 4px 6px rgba(0,0,0,0.1), 0 2px 4px rgba(0,0,0,0.06);
+    --border-radius-sm: 6px;
+    --border-radius-md: 10px;
+    --font-inter: 'Inter', sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-inter);
+    background-color: var(--background-color);
+    color: var(--text-color-dark);
+    line-height: 1.6;
+    display: flex;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 2rem; /* Add some padding around the main content */
+}
+
+/* --- Main Container & Header --- */
+.main-container {
+    max-width: 1200px;
+    width: 100%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem; /* Space between header and content grid */
+}
+
+.app-header {
+    text-align: center;
+    background-color: var(--card-background);
+    padding: 2.5rem 2rem;
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-medium);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.app-header .logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: var(--primary-color);
+}
+
+.app-header .logo i {
+    font-size: 2.5rem;
+}
+
+.app-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-color-dark);
+}
+
+.app-header .tagline {
+    font-size: 1.1rem;
+    color: var(--text-color-medium);
+    font-weight: 400;
+    margin-top: 0.5rem;
+}
+
+/* --- Content Grid (for responsive layout) --- */
+.content-grid {
+    display: grid;
+    grid-template-columns: 1fr; /* Single column on small screens */
+    gap: 2.5rem;
+}
+
+@media (min-width: 992px) { /* Two columns on larger screens */
+    .content-grid {
+        grid-template-columns: 1fr 2fr; /* Scan card smaller than dashboard */
+    }
+}
+
+/* --- Card Styles (general) --- */
+.card {
+    background-color: var(--card-background);
+    border-radius: var(--border-radius-md);
+    box-shadow: var(--shadow-medium);
+    padding: 2rem;
+}
+
+.card-title {
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: var(--text-color-dark);
+    margin-bottom: 1.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* --- Scan Form --- */
+.scan-card .card-title i {
+    color: var(--primary-color);
+}
+
+#scan-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.form-group label {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--text-color-medium);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-group label i {
+    color: var(--text-color-light);
+}
+
+.barcode-input {
+    width: 100%;
+    padding: 0.9rem 1.2rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    font-size: 1rem;
+    font-family: var(--font-inter);
+    color: var(--text-color-dark);
+    background-color: var(--background-color);
+    transition: all 0.2s ease-in-out;
+}
+
+.barcode-input::placeholder {
+    color: var(--text-color-light);
+    opacity: 0.7;
+}
+
+.barcode-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); /* primary-color with transparency */
+    background-color: var(--card-background);
+}
+
+.primary-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 1rem 1.5rem;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius-sm);
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    margin-top: 0.5rem; /* A little space from inputs */
+}
+
+.primary-btn:hover {
+    background-color: var(--primary-dark);
+    box-shadow: var(--shadow-light);
+}
+
+.primary-btn:disabled {
+    background-color: #9CA3AF;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* --- Dashboard Table --- */
+.dashboard-card .card-title i {
+    color: var(--success-color);
+}
+
+#scans-table-container {
+    overflow-x: auto; /* Ensures table is scrollable on small screens */
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+}
+
+#scans-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+}
+
+#scans-table th,
+#scans-table td {
+    padding: 1rem 1.2rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+    word-break: break-word; /* Prevents overflow for very long barcodes */
+}
+
+#scans-table th {
+    background-color: var(--background-color);
+    font-weight: 600;
+    color: var(--text-color-medium);
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+}
+
+#scans-table tbody tr:last-child td {
+    border-bottom: none; /* No border for the last row */
+}
+
+#scans-table tbody tr:hover {
+    background-color: #F3F4F6; /* Light hover effect */
+}
+
+/* --- Result Badges --- */
+.result-badge {
+    font-weight: 600;
+    padding: 0.4em 0.8em;
+    border-radius: var(--border-radius-sm);
+    color: white;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3em;
+    font-size: 0.85em;
+}
+
+.result-match {
+    background-color: var(--success-color);
+}
+
+.result-no-match {
+    background-color: var(--error-color);
+}
+
+/* --- Empty State Message --- */
+.empty-state {
+    display: none; /* Hidden by default, shown by JS */
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-color-light);
+    font-style: italic;
+    font-size: 1.1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.empty-state i {
+    font-size: 2.5rem;
+    color: var(--border-color);
+}
+
+/* --- Alerts (simple browser alert, not styled here) --- */
+/* The script uses window.alert, which is browser-native and unstylable.
+   For a truly custom UI/UX, this would be a custom modal. */
