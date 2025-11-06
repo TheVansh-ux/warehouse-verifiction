@@ -6,7 +6,7 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // --- Configuration ---
-    const API_BASE_URL = 'https://warehouse-verifiction.onrender.com';
+    const API_BASE_URL = 'https://warehouse-verification.onrender.com';
     const REFRESH_INTERVAL_MS = 10000; // 10 seconds
 
     // --- DOM Element Selectors ---
