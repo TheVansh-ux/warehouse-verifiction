@@ -327,6 +327,33 @@ body {
 .toast.toast-error {
     border-left-color: var(--error-color);
 }
+/* --- Mobile Table Enhancements --- */
+@media (max-width: 767px) {
+    
+    /* Make the card title smaller on mobile */
+    .card-title {
+        font-size: 1.25rem;
+    }
+
+    /* Target the table cells and headers only on mobile */
+    #scans-table th,
+    #scans-table td {
+        /* This is the key: stop text from wrapping */
+        white-space: nowrap;
+        
+        /* Reduce padding to save space */
+        padding: 0.75rem 0.9rem;
+
+        /* Make text slightly smaller */
+        font-size: 0.875rem;
+    }
+
+    /* Make the result badge a bit smaller */
+    .result-badge {
+        padding: 0.3em 0.6em;
+        font-size: 0.8rem;
+    }
+}
 /* --- Alerts (simple browser alert, not styled here) --- */
 /* The script uses window.alert, which is browser-native and unstylable.
    For a truly custom UI/UX, this would be a custom modal. */
