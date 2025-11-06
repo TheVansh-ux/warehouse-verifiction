@@ -1,14 +1,19 @@
 /**
  * Frontend JavaScript for the Warehouse Verification App.
  * Handles API calls and DOM manipulation.
+ * Includes Audio Cues.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
 
     // --- Configuration ---
-    // Make sure this is your LIVE backend URL
     const API_BASE_URL = 'https://warehouse-verification.onrender.com/'; 
-    const REFRESH_INTERVAL_MS = 10000; // 10 seconds
+    const REFRESH_INTERVAL_MS = 10000;
+
+    // --- NEW: Audio Cue Setup ---
+    // Make sure you have these files in your /frontend folder
+    const passSound = new Audio('pass-beep.mp3');
+    const failSound = new Audio('fail-buzz.mp3');
 
     // --- DOM Element Selectors ---
     const scanForm = document.getElementById('scan-form');
@@ -67,10 +72,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /**
      * Submits the two barcodes to the backend API.
-     * (MODIFIED: "Pass" / "Fail" for toasts)
+     * (MODIFIED: Added audio cues)
      */
     async function submitScan(barcode1, barcode2) {
-        // Trim trailing slash from base URL if present
         const cleanApiBaseUrl = API_BASE_URL.replace(/\/$/, "");
         
         const response = await fetch(`${cleanApiBaseUrl}/api/scan`, {
@@ -86,11 +90,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const data = await response.json();
 
-        // --- UPDATED TEXT ---
         if (data.result === 'Match') {
             showToast('✅ Pass!', 'success');
+            passSound.play(); // <-- Play pass sound
         } else {
             showToast('❌ Fail!', 'error');
+            failSound.play(); // <-- Play fail sound
         }
 
         await fetchScans();
@@ -98,9 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function fetchScans() {
         try {
-            // Trim trailing slash from base URL if present
             const cleanApiBaseUrl = API_BASE_URL.replace(/\/$/, "");
-
             const response = await fetch(`${cleanApiBaseUrl}/api/scans`);
             if (!response.ok) {
                 throw new Error('Network response was not ok');
@@ -113,10 +116,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    /**
-     * Renders the fetched scan data into the dashboard table.
-     * (MODIFIED: "Pass" / "Fail" for table)
-     */
     function renderScansTable(scans) {
         scansTbody.innerHTML = '';
 
@@ -129,10 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             scans.forEach(scan => {
                 const tr = document.createElement('tr');
-                
-                // --- UPDATED TEXT ---
                 const resultText = scan.result === 1 ? 'Pass' : 'Fail';
-                
                 const resultIcon = scan.result === 1 ? '<i class="fa-solid fa-check"></i>' : '<i class="fa-solid fa-xmark"></i>';
                 const resultClass = scan.result === 1 ? 'result-match' : 'result-no-match';
                 
