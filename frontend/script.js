@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Configuration ---
     // Make sure this is your LIVE backend URL
-    const API_BASE_URL = 'https://warehouse-verification.onrender.com'; 
+    const API_BASE_URL = 'https://warehouse-verification.onrender.com/'; 
     const REFRESH_INTERVAL_MS = 10000; // 10 seconds
 
     // --- DOM Element Selectors ---
@@ -44,7 +44,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const barcode2 = barcode2Input.value.trim();
 
         if (!barcode1 || !barcode2) {
-            // Use toast for validation error
             showToast('❌ Please enter both barcodes.', 'error');
             return;
         }
@@ -56,7 +55,6 @@ document.addEventListener('DOMContentLoaded', () => {
             await submitScan(barcode1, barcode2);
         } catch (error) {
             console.error('Submission failed:', error);
-            // Use toast for server error
             showToast(`❌ Error: ${error.message}`, 'error');
         } finally {
             verifyBtn.disabled = false;
@@ -69,10 +67,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     /**
      * Submits the two barcodes to the backend API.
-     * (MODIFIED: Replaced alert() with showToast())
+     * (MODIFIED: "Pass" / "Fail" for toasts)
      */
     async function submitScan(barcode1, barcode2) {
-        const response = await fetch(`${API_BASE_URL}/api/scan`, {
+        // Trim trailing slash from base URL if present
+        const cleanApiBaseUrl = API_BASE_URL.replace(/\/$/, "");
+        
+        const response = await fetch(`${cleanApiBaseUrl}/api/scan`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ barcode1, barcode2 }),
@@ -85,11 +86,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const data = await response.json();
 
-        // --- REPLACED ALERT ---
+        // --- UPDATED TEXT ---
         if (data.result === 'Match') {
-            showToast('✅ Match!', 'success');
+            showToast('✅ Pass!', 'success');
         } else {
-            showToast('❌ No Match!', 'error');
+            showToast('❌ Fail!', 'error');
         }
 
         await fetchScans();
@@ -97,7 +98,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function fetchScans() {
         try {
-            const response = await fetch(`${API_BASE_URL}/api/scans`);
+            // Trim trailing slash from base URL if present
+            const cleanApiBaseUrl = API_BASE_URL.replace(/\/$/, "");
+
+            const response = await fetch(`${cleanApiBaseUrl}/api/scans`);
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
@@ -109,6 +113,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    /**
+     * Renders the fetched scan data into the dashboard table.
+     * (MODIFIED: "Pass" / "Fail" for table)
+     */
     function renderScansTable(scans) {
         scansTbody.innerHTML = '';
 
@@ -121,11 +129,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
             scans.forEach(scan => {
                 const tr = document.createElement('tr');
-                const resultText = scan.result === 1 ? 'Match' : 'No Match';
+                
+                // --- UPDATED TEXT ---
+                const resultText = scan.result === 1 ? 'Pass' : 'Fail';
+                
                 const resultIcon = scan.result === 1 ? '<i class="fa-solid fa-check"></i>' : '<i class="fa-solid fa-xmark"></i>';
                 const resultClass = scan.result === 1 ? 'result-match' : 'result-no-match';
                 
-                // 👇 This line was fixed 👇
                 const timestamp = new Date(scan.created_at).toLocaleString('sv-SE', {
                     year: 'numeric',
                     month: '2-digit',
@@ -156,39 +166,23 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- NEW HELPER FUNCTION ---
-    /**
-     * Shows a toast notification at the corner of the screen.
-     * @param {string} message - The text to display.
-     * @param {string} type - 'success' or 'error' to control the color.
-     */
     function showToast(message, type = 'success') {
         const toastContainer = document.getElementById('toast-container');
-
-        // Create the toast element
         const toast = document.createElement('div');
         toast.classList.add('toast', `toast-${type}`);
-        toast.innerHTML = message; // Using innerHTML to render icons like ✅
-
-        // Add to container
+        toast.innerHTML = message;
         toastContainer.appendChild(toast);
 
-        // --- Animation ---
-        // 1. Trigger the "show" transition
         setTimeout(() => {
             toast.classList.add('show');
-        }, 10); // A small delay to allow the element to be in the DOM first
+        }, 10);
 
-        // 2. Set timer to remove the toast
         setTimeout(() => {
-            toast.classList.remove('show'); // Trigger "hide" animation
-
-            // 3. Remove from DOM after animation finishes
+            toast.classList.remove('show');
             toast.addEventListener('transitionend', () => {
                 toast.remove();
             }, { once: true });
-
-        }, 3000); // Toast stays for 3 seconds
+        }, 3000);
     }
 
     // --- Initialization ---
