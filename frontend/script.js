@@ -183,14 +183,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }, { once: true });
         }, 3000);
     }
-    // --- NEW HELPER FUNCTION ---
+// --- NEW HELPER FUNCTION (REVISED) ---
 /**
  * Triggers a full-screen color flash.
  * @param {string} type - 'success' or 'fail'
  */
 function triggerScreenFlash(type) {
     // Clear any previous flash classes
-    flashOverlay.classList.remove('flash-success', 'flash-fail');
+    flashOverlay.classList.remove('flash-success', 'flash-fail', 'flash-active');
 
     // Add the correct color class
     if (type === 'success') {
@@ -199,13 +199,20 @@ function triggerScreenFlash(type) {
         flashOverlay.classList.add('flash-fail');
     }
 
-    // Add the class to trigger the opacity animation
-    flashOverlay.classList.add('flash-active');
-
-    // Set a timer to remove the active class, making it fade out
+    // --- THIS IS THE FIX ---
+    //
+    // Force the browser to apply the color class (flash-success/fail) FIRST
+    // We use a tiny 10ms timeout for this.
     setTimeout(() => {
-        flashOverlay.classList.remove('flash-active');
-    }, 150); // 150ms flash duration
+        // NOW, add the class to make it visible
+        flashOverlay.classList.add('flash-active');
+
+        // Set a timer to remove the active class, making it fade out
+        setTimeout(() => {
+            flashOverlay.classList.remove('flash-active');
+        }, 150); // 150ms flash duration
+        
+    }, 10); // 10ms delay before flashing
 }
 
     // --- Initialization ---
