@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Configuration ---
     // Make sure this is your LIVE backend URL
-    const API_BASE_URL = 'https://warehouse-backend.onrender.com'; 
+    const API_BASE_URL = 'https://warehouse-verification.onrender.com'; 
     const REFRESH_INTERVAL_MS = 10000; // 10 seconds
 
     // --- DOM Element Selectors ---
