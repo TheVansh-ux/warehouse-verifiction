@@ -223,4 +223,5 @@ function triggerScreenFlash(type) {
 
 
     initializeApp();
+    
 });

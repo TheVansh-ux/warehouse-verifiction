@@ -388,6 +388,7 @@ body {
 /* This class triggers the flash */
 .flash-active {
     opacity: 1;
+    
 }
 /* --- Alerts (simple browser alert, not styled here) --- */
 /* The script uses window.alert, which is browser-native and unstylable.
