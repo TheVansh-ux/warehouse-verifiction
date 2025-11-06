@@ -354,6 +354,41 @@ body {
         font-size: 0.8rem;
     }
 }
+/* --- Screen Flash Overlay --- */
+#flash-overlay {
+    /* Position it over the entire screen */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    
+    /* Invisible by default */
+    opacity: 0;
+    
+    /* Make sure it's on top */
+    z-index: 2000;
+    
+    /* Make it "un-clickable" so it doesn't block buttons */
+    pointer-events: none;
+    
+    /* Speed of the flash */
+    transition: opacity 0.1s ease-in-out;
+}
+
+/* These classes will be added by JavaScript */
+.flash-success {
+    background-color: rgba(16, 185, 129, 0.3); /* Semi-transparent green */
+}
+
+.flash-fail {
+    background-color: rgba(239, 68, 68, 0.3); /* Semi-transparent red */
+}
+
+/* This class triggers the flash */
+.flash-active {
+    opacity: 1;
+}
 /* --- Alerts (simple browser alert, not styled here) --- */
 /* The script uses window.alert, which is browser-native and unstylable.
    For a truly custom UI/UX, this would be a custom modal. */

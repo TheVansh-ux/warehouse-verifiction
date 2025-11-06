@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const scansTbody = document.getElementById('scans-tbody');
     const scansTable = document.getElementById('scans-table');
     const noScansMessage = document.getElementById('no-scans-message');
+    const flashOverlay = document.getElementById('flash-overlay');
 
     // --- Event Listeners ---
     scanForm.addEventListener('submit', handleVerificationSubmit);
@@ -93,9 +94,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (data.result === 'Match') {
             showToast('✅ Pass!', 'success');
             passSound.play(); // <-- Play pass sound
+            triggerScreenFlash('success');
         } else {
             showToast('❌ Fail!', 'error');
             failSound.play(); // <-- Play fail sound
+            triggerScreenFlash('fail');
         }
 
         await fetchScans();
@@ -180,12 +183,37 @@ document.addEventListener('DOMContentLoaded', () => {
             }, { once: true });
         }, 3000);
     }
+    // --- NEW HELPER FUNCTION ---
+/**
+ * Triggers a full-screen color flash.
+ * @param {string} type - 'success' or 'fail'
+ */
+function triggerScreenFlash(type) {
+    // Clear any previous flash classes
+    flashOverlay.classList.remove('flash-success', 'flash-fail');
+
+    // Add the correct color class
+    if (type === 'success') {
+        flashOverlay.classList.add('flash-success');
+    } else {
+        flashOverlay.classList.add('flash-fail');
+    }
+
+    // Add the class to trigger the opacity animation
+    flashOverlay.classList.add('flash-active');
+
+    // Set a timer to remove the active class, making it fade out
+    setTimeout(() => {
+        flashOverlay.classList.remove('flash-active');
+    }, 150); // 150ms flash duration
+}
 
     // --- Initialization ---
     function initializeApp() {
         fetchScans();
         setInterval(fetchScans, REFRESH_INTERVAL_MS);
     }
+
 
     initializeApp();
 });
