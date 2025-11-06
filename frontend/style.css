@@ -277,6 +277,56 @@ body {
     color: var(--border-color);
 }
 
+/* --- Button Click Interaction --- */
+.primary-btn:active {
+    /* "Presses" the button down */
+    transform: scale(0.98);
+    box-shadow: var(--shadow-light);
+}
+
+/* --- Toast Notification Container --- */
+#toast-container {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 1rem;
+    z-index: 1000;
+}
+
+/* --- Individual Toast Styling --- */
+.toast {
+    background-color: var(--card-background);
+    color: var(--text-color-dark);
+    font-size: 1rem;
+    font-weight: 500;
+    padding: 1rem 1.5rem;
+    border-radius: var(--border-radius-sm);
+    box-shadow: var(--shadow-medium);
+    border-left: 5px solid; /* Colored border for type */
+    
+    /* Animation setup */
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+}
+
+/* Show state */
+.toast.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+/* Different toast types */
+.toast.toast-success {
+    border-left-color: var(--success-color);
+}
+
+.toast.toast-error {
+    border-left-color: var(--error-color);
+}
 /* --- Alerts (simple browser alert, not styled here) --- */
 /* The script uses window.alert, which is browser-native and unstylable.
    For a truly custom UI/UX, this would be a custom modal. */
