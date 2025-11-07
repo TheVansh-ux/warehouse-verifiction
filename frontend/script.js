@@ -1,21 +1,11 @@
-/**
- * Frontend JavaScript for the Warehouse Verification App.
- * Handles API calls and DOM manipulation.
- * Includes Audio Cues.
- */
-
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- Configuration ---
     const API_BASE_URL = 'https://warehouse-verification.onrender.com/'; 
     const REFRESH_INTERVAL_MS = 10000;
 
-    // --- NEW: Audio Cue Setup ---
-    // Make sure you have these files in your /frontend folder
     const passSound = new Audio('pass-beep.mp3');
     const failSound = new Audio('fail-buzz.mp3');
 
-    // --- DOM Element Selectors ---
     const scanForm = document.getElementById('scan-form');
     const barcode1Input = document.getElementById('barcode1');
     const barcode2Input = document.getElementById('barcode2');
@@ -25,12 +15,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const noScansMessage = document.getElementById('no-scans-message');
     const flashOverlay = document.getElementById('flash-overlay');
 
-    // --- Event Listeners ---
     scanForm.addEventListener('submit', handleVerificationSubmit);
     barcode1Input.addEventListener('keypress', handleEnterKey);
     barcode2Input.addEventListener('keypress', handleEnterKey);
-
-    // --- Core Functions ---
 
     function handleEnterKey(e) {
         if (e.key === 'Enter') {
@@ -71,10 +58,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    /**
-     * Submits the two barcodes to the backend API.
-     * (MODIFIED: Added audio cues)
-     */
     async function submitScan(barcode1, barcode2) {
         const cleanApiBaseUrl = API_BASE_URL.replace(/\/$/, "");
         
@@ -93,11 +76,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (data.result === 'Match') {
             showToast('✅ Pass!', 'success');
-            passSound.play(); // <-- Play pass sound
+            passSound.play();
             triggerScreenFlash('success');
         } else {
             showToast('❌ Fail!', 'error');
-            failSound.play(); // <-- Play fail sound
+            failSound.play();
             triggerScreenFlash('fail');
         }
 
@@ -183,44 +166,26 @@ document.addEventListener('DOMContentLoaded', () => {
             }, { once: true });
         }, 3000);
     }
-// --- NEW HELPER FUNCTION (REVISED) ---
-/**
- * Triggers a full-screen color flash.
- * @param {string} type - 'success' or 'fail'
- */
-function triggerScreenFlash(type) {
-    // Clear any previous flash classes
-    flashOverlay.classList.remove('flash-success', 'flash-fail', 'flash-active');
 
-    // Add the correct color class
+function triggerScreenFlash(type) {
+    flashOverlay.classList.remove('flash-success', 'flash-fail', 'flash-active');
     if (type === 'success') {
         flashOverlay.classList.add('flash-success');
     } else {
         flashOverlay.classList.add('flash-fail');
     }
-
-    // --- THIS IS THE FIX ---
-    //
-    // Force the browser to apply the color class (flash-success/fail) FIRST
-    // We use a tiny 10ms timeout for this.
     setTimeout(() => {
-        // NOW, add the class to make it visible
         flashOverlay.classList.add('flash-active');
-
-        // Set a timer to remove the active class, making it fade out
         setTimeout(() => {
             flashOverlay.classList.remove('flash-active');
-        }, 150); // 150ms flash duration
-        
-    }, 10); // 10ms delay before flashing
+        }, 150);
+    }, 10);
 }
 
-    // --- Initialization ---
     function initializeApp() {
         fetchScans();
         setInterval(fetchScans, REFRESH_INTERVAL_MS);
     }
-
 
     initializeApp();
     

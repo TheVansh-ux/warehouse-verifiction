@@ -1,15 +1,14 @@
-/* --- Global Styles & Variables --- */
 :root {
-    --primary-color: #3B82F6; /* A clean blue, inspired by the image */
+    --primary-color: #3B82F6; 
     --primary-dark: #2563EB;
-    --background-color: #F8FAFC; /* Light gray background */
+    --background-color: #F8FAFC; 
     --card-background: #FFFFFF;
     --text-color-dark: #1F2937;
     --text-color-medium: #4B5563;
     --text-color-light: #6B7280;
     --border-color: #E5E7EB;
-    --success-color: #10B981; /* Green */
-    --error-color: #EF4444;   /* Red */
+    --success-color: #10B981;
+    --error-color: #EF4444;
     --shadow-light: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.05);
     --shadow-medium: 0 4px 6px rgba(0,0,0,0.1), 0 2px 4px rgba(0,0,0,0.06);
     --border-radius-sm: 6px;
@@ -31,17 +30,16 @@ body {
     display: flex;
     justify-content: center;
     min-height: 100vh;
-    padding: 2rem; /* Add some padding around the main content */
+    padding: 2rem;
 }
 
-/* --- Main Container & Header --- */
 .main-container {
     max-width: 1200px;
     width: 100%;
     margin: 0 auto;
     display: flex;
     flex-direction: column;
-    gap: 2.5rem; /* Space between header and content grid */
+    gap: 2.5rem;
 }
 
 .app-header {
@@ -80,20 +78,18 @@ body {
     margin-top: 0.5rem;
 }
 
-/* --- Content Grid (for responsive layout) --- */
 .content-grid {
     display: grid;
-    grid-template-columns: 1fr; /* Default: Single column for mobile */
+    grid-template-columns: 1fr;
     gap: 2.5rem;
 }
 
-@media (min-width: 992px) { /* Switch to two columns on larger screens */
+@media (min-width: 992px) {
     .content-grid {
         grid-template-columns: 1fr 2fr; 
     }
 }
 
-/* --- Card Styles (general) --- */
 .card {
     background-color: var(--card-background);
     border-radius: var(--border-radius-md);
@@ -113,7 +109,6 @@ body {
     gap: 0.5rem;
 }
 
-/* --- Scan Form --- */
 .scan-card .card-title i {
     color: var(--primary-color);
 }
@@ -163,7 +158,7 @@ body {
 .barcode-input:focus {
     outline: none;
     border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); /* primary-color with transparency */
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
     background-color: var(--card-background);
 }
 
@@ -182,7 +177,7 @@ body {
     font-weight: 600;
     cursor: pointer;
     transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-    margin-top: 0.5rem; /* A little space from inputs */
+    margin-top: 0.5rem;
 }
 
 .primary-btn:hover {
@@ -196,13 +191,12 @@ body {
     box-shadow: none;
 }
 
-/* --- Dashboard Table --- */
 .dashboard-card .card-title i {
     color: var(--success-color);
 }
 
 #scans-table-container {
-    overflow-x: auto; /* Ensures table is scrollable on small screens */
+    overflow-x: auto;
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius-sm);
 }
@@ -218,7 +212,7 @@ body {
     padding: 1rem 1.2rem;
     text-align: left;
     border-bottom: 1px solid var(--border-color);
-    word-break: break-word; /* Prevents overflow for very long barcodes */
+    word-break: break-word;
 }
 
 #scans-table th {
@@ -231,14 +225,13 @@ body {
 }
 
 #scans-table tbody tr:last-child td {
-    border-bottom: none; /* No border for the last row */
+    border-bottom: none;
 }
 
 #scans-table tbody tr:hover {
-    background-color: #F3F4F6; /* Light hover effect */
+    background-color: #F3F4F6;
 }
 
-/* --- Result Badges --- */
 .result-badge {
     font-weight: 600;
     padding: 0.4em 0.8em;
@@ -258,9 +251,8 @@ body {
     background-color: var(--error-color);
 }
 
-/* --- Empty State Message --- */
 .empty-state {
-    display: none; /* Hidden by default, shown by JS */
+    display: none;
     text-align: center;
     padding: 3rem 1rem;
     color: var(--text-color-light);
@@ -277,14 +269,11 @@ body {
     color: var(--border-color);
 }
 
-/* --- Button Click Interaction --- */
 .primary-btn:active {
-    /* "Presses" the button down */
     transform: scale(0.98);
     box-shadow: var(--shadow-light);
 }
 
-/* --- Toast Notification Container --- */
 #toast-container {
     position: fixed;
     bottom: 2rem;
@@ -296,7 +285,6 @@ body {
     z-index: 1000;
 }
 
-/* --- Individual Toast Styling --- */
 .toast {
     background-color: var(--card-background);
     color: var(--text-color-dark);
@@ -305,21 +293,17 @@ body {
     padding: 1rem 1.5rem;
     border-radius: var(--border-radius-sm);
     box-shadow: var(--shadow-medium);
-    border-left: 5px solid; /* Colored border for type */
-    
-    /* Animation setup */
+    border-left: 5px solid;
     opacity: 0;
     transform: translateX(100%);
     transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
 }
 
-/* Show state */
 .toast.show {
     opacity: 1;
     transform: translateX(0);
 }
 
-/* Different toast types */
 .toast.toast-success {
     border-left-color: var(--success-color);
 }
@@ -327,69 +311,45 @@ body {
 .toast.toast-error {
     border-left-color: var(--error-color);
 }
-/* --- Mobile Table Enhancements --- */
+
 @media (max-width: 767px) {
-    
-    /* Make the card title smaller on mobile */
     .card-title {
         font-size: 1.25rem;
     }
 
-    /* Target the table cells and headers only on mobile */
     #scans-table th,
     #scans-table td {
-        /* This is the key: stop text from wrapping */
         white-space: nowrap;
-        
-        /* Reduce padding to save space */
         padding: 0.75rem 0.9rem;
-
-        /* Make text slightly smaller */
         font-size: 0.875rem;
     }
 
-    /* Make the result badge a bit smaller */
     .result-badge {
         padding: 0.3em 0.6em;
         font-size: 0.8rem;
     }
 }
-/* --- Screen Flash Overlay --- */
+
 #flash-overlay {
-    /* Position it over the entire screen */
     position: fixed;
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
-    
-    /* Invisible by default */
     opacity: 0;
-    
-    /* Make sure it's on top */
     z-index: 2000;
-    
-    /* Make it "un-clickable" so it doesn't block buttons */
     pointer-events: none;
-    
-    /* Speed of the flash */
     transition: opacity 0.1s ease-in-out;
 }
 
-/* These classes will be added by JavaScript */
 .flash-success {
-    background-color: rgba(16, 185, 129, 0.3); /* Semi-transparent green */
+    background-color: rgba(16, 185, 129, 0.3);
 }
 
 .flash-fail {
-    background-color: rgba(239, 68, 68, 0.3); /* Semi-transparent red */
+    background-color: rgba(239, 68, 68, 0.3);
 }
 
-/* This class triggers the flash */
 .flash-active {
     opacity: 1;
-    
 }
-/* --- Alerts (simple browser alert, not styled here) --- */
-/* The script uses window.alert, which is browser-native and unstylable.
-   For a truly custom UI/UX, this would be a custom modal. */
