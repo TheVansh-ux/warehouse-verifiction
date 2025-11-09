@@ -39,7 +39,7 @@ try:
     # Create a connection pool instead of single connections
     cnx_pool = mysql.connector.pooling.MySQLConnectionPool(
         pool_name="barcode_pool",
-        pool_size=5,
+        pool_size=1,
         **DB_CONFIG
     )
     print("Database connection pool created successfully.")
