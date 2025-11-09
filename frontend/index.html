@@ -4,104 +4,163 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Warehouse Verification</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- We're using a lighter, more modern "Inter" font weight -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- The screen flash overlay is still here -->
     <div id="flash-overlay"></div>
+    <!-- The toast container is still here -->
+    <div id="toast-container"></div>
 
-    <div class="main-container">
-        <header class="app-header">
-            <div class="logo">
-                <i class="fa-solid fa-boxes-stacked"></i>
-                <h1>Warehouse Verification</h1>
-            </div>
+    <!-- NEW: Professional Sidebar -->
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <i class="fa-solid fa-boxes-stacked"></i>
+        </div>
+        <ul class="sidebar-menu">
+            <!-- This is the active page -->
+            <li class="menu-item active">
+                <i class="fa-solid fa-grid-horizontal"></i>
+                <span>Dashboard</span>
+            </li>
+            <li class="menu-item">
+                <i class="fa-solid fa-box-archive"></i>
+                <span>Inventory</span>
+            </li>
+            <li class="menu-item">
+                <i class="fa-solid fa-users"></i>
+                <span>Users</span>
+            </li>
+            <li class="menu-item">
+                <i class="fa-solid fa-gear"></i>
+                <span>Settings</span>
+            </li>
+        </ul>
+        <div class="sidebar-footer">
+            <i class="fa-solid fa-circle-question"></i>
+        </div>
+    </nav>
+
+    <!-- NEW: Main Content Area -->
+    <main class="main-content">
+        <!-- Main page header -->
+        <header class="page-header">
+            <h1>Warehouse Verification</h1>
             <p class="tagline">Enter barcode for your product verification process.</p>
         </header>
 
-        <!-- This is the corrected grid layout -->
+        <!-- The layout is the same, but lives inside "main-content" -->
         <div class="content-grid">
-            
-            <!-- This div wraps all cards in the left column -->
             <div class="left-column">
                 
+                <!-- Card 1: Scan -->
                 <section class="card scan-card">
-                    <h2 class="card-title">New Scan Verification</h2>
-                    <form id="scan-form">
-                        <div class="form-group">
-                            <label for="barcode1"><i class="fa-solid fa-barcode"></i> Barcode 1 (Original)</label>
-                            <input type="text" id="barcode1" class="barcode-input" placeholder="Scan or enter first barcode..." required autofocus>
-                        </div>
-                        <div class="form-group">
-                            <label for="barcode2"><i class="fa-solid fa-barcode"></i> Barcode 2 (To Verify)</label>
-                            <input type="text" id="barcode2" class="barcode-input" placeholder="Scan or enter second barcode..." required>
-                        </div>
-                        <button type="submit" id="verify-btn" class="primary-btn">
-                            <i class="fa-solid fa-check-double"></i> Verify Product
-                        </button>
-                    </form>
+                    <header class="card-header">
+                        <h2 class="card-title">New Scan Verification</h2>
+                    </header>
+                    <div class="card-body">
+                        <form id="scan-form">
+                            <!-- NEW: Redesigned Input Group -->
+                            <div class="input-group">
+                                <label for="barcode1">Barcode 1 (Original)</label>
+                                <div class="input-wrapper">
+                                    <i class="fa-solid fa-barcode input-icon"></i>
+                                    <input type="text" id="barcode1" class="barcode-input" placeholder="Scan or enter first barcode..." required autofocus>
+                                </div>
+                            </div>
+                            <!-- NEW: Redesigned Input Group -->
+                            <div class="input-group">
+                                <label for="barcode2">Barcode 2 (To Verify)</label>
+                                <div class="input-wrapper">
+                                    <i class="fa-solid fa-barcode input-icon"></i>
+                                    <input type="text" id="barcode2" class="barcode-input" placeholder="Scan or enter second barcode..." required>
+                                </div>
+                            </div>
+                            <button type="submit" id="verify-btn" class="primary-btn">
+                                <i class="fa-solid fa-check-double"></i>
+                                <span>Verify Product</span>
+                            </button>
+                        </form>
+                    </div>
                 </section>
 
+                <!-- Card 2: Reports -->
                 <section class="card report-card">
-                    <h2 class="card-title">Reports</h2>
-                    <div class="stats-container">
-                        <div class="stat-box">
-                            <span class="stat-value" id="stat-total">0</span>
-                            <span class="stat-label">Total Scans</span>
+                    <header class="card-header">
+                        <h2 class="card-title">Reports</h2>
+                    </header>
+                    <div class="card-body">
+                        <div class="stats-container">
+                            <div class="stat-box">
+                                <span class="stat-label">Total Scans</span>
+                                <span class="stat-value" id="stat-total">0</span>
+                            </div>
+                            <div class="stat-box">
+                                <span class="stat-label">Passed</span>
+                                <span class="stat-value pass" id="stat-passed">0</span>
+                            </div>
+                            <div class="stat-box">
+                                <span class="stat-label">Failed</span>
+                                <span class="stat-value fail" id="stat-failed">0</span>
+                            </div>
                         </div>
-                        <div class="stat-box">
-                            <span class="stat-value pass" id="stat-passed">0</span>
-                            <span class="stat-label">Passed</span>
+                        <div class="chart-container" style="max-height: 250px;">
+                            <canvas id="stats-pie-chart"></canvas>
                         </div>
-                        <div class="stat-box">
-                            <span class="stat-value fail" id="stat-failed">0</span>
-                            <span class="stat-label">Failed</span>
-                        </div>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="stats-pie-chart"></canvas>
                     </div>
                 </section>
                 
+                <!-- Card 3: Shift Activity -->
                 <section class="card shift-card">
-                    <h2 class="card-title">Today's Shift Activity</h2>
-                    <div class="chart-container">
-                        <canvas id="shift-bar-chart"></canvas>
+                    <header class="card-header">
+                        <h2 class="card-title">Today's Shift Activity</h2>
+                    </header>
+                    <div class="card-body">
+                        <div class="chart-container" style="min-height: 250px; position: relative;">
+                            <canvas id="shift-bar-chart"></canvas>
+                        </div>
                     </div>
                 </section>
-                
+
             </div> <!-- End of left-column -->
             
-            <!-- The dashboard card is now on its own -->
+            <!-- Card 4: Main Dashboard Table -->
             <section class="card dashboard-card">
-                <h2 class="card-title">Recent Scan Activity</h2>
-                <div id="scans-table-container">
-                    <table id="scans-table">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Barcode 1</th>
-                                <th>Barcode 2</th>
-                                <th>Result</th>
-                                <th>Timestamp</th>
-                            </tr>
-                        </thead>
-                        <tbody id="scans-tbody">
-                        </tbody>
-                    </table>
-                    <p id="no-scans-message" class="empty-state">
-                        <i class="fa-solid fa-inbox"></i> No scans recorded yet. Verify an item to see results.
-                    </p>
+                <header class="card-header">
+                    <h2 class="card-title">Recent Scan Activity</h2>
+                </header>
+                <div class="card-body">
+                    <div id="scans-table-container">
+                        <table id="scans-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Barcode 1</th>
+                                    <th>Barcode 2</th>
+                                    <th>Result</th>
+                                    <th>Timestamp</th>
+                                </tr>
+                            </thead>
+                            <tbody id="scans-tbody">
+                                <!-- JS will populate this -->
+                            </tbody>
+                        </table>
+                        <p id="no-scans-message" class="empty-state">
+                            <i class="fa-solid fa-inbox"></i>
+                            <span>No scans recorded yet.</span>
+                            <small>Verify an item to see results.</small>
+                        </p>
+                    </div>
                 </div>
             </section>
             
         </div> <!-- End of content-grid -->
+    </main> <!-- End of main-content -->
 
-    </div> <!-- End of main-container -->
-    
     <script src="script.js" defer></script>
-    <div id="toast-container"></div>
 </body>
 </html>
