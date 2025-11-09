@@ -80,18 +80,27 @@ body {
     margin-top: 0.5rem;
 }
 
+/* --- Layout Grid --- */
 .content-grid {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr; /* Mobile: 1 column */
     gap: 2.5rem;
 }
 
 @media (min-width: 992px) {
     .content-grid {
-        grid-template-columns: 1fr 2fr; 
+        grid-template-columns: 1fr 2fr; /* Desktop: 2 columns */
     }
 }
 
+/* This new rule stacks the left cards */
+.left-column {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem; 
+}
+
+/* --- Card Styles (general) --- */
 .card {
     background-color: var(--card-background);
     border-radius: var(--border-radius-md);
@@ -111,6 +120,7 @@ body {
     gap: 0.5rem;
 }
 
+/* --- Scan Form --- */
 .scan-card .card-title i {
     color: var(--primary-color);
 }
@@ -193,6 +203,7 @@ body {
     box-shadow: none;
 }
 
+/* --- Dashboard Table --- */
 .dashboard-card .card-title i {
     color: var(--success-color);
 }
@@ -271,11 +282,13 @@ body {
     color: var(--border-color);
 }
 
+/* --- Button Click --- */
 .primary-btn:active {
     transform: scale(0.98);
     box-shadow: var(--shadow-light);
 }
 
+/* --- Toasts --- */
 #toast-container {
     position: fixed;
     bottom: 2rem;
@@ -314,24 +327,7 @@ body {
     border-left-color: var(--error-color);
 }
 
-@media (max-width: 767px) {
-    .card-title {
-        font-size: 1.25rem;
-    }
-
-    #scans-table th,
-    #scans-table td {
-        white-space: nowrap;
-        padding: 0.75rem 0.9rem;
-        font-size: 0.875rem;
-    }
-
-    .result-badge {
-        padding: 0.3em 0.6em;
-        font-size: 0.8rem;
-    }
-}
-
+/* --- Screen Flash --- */
 #flash-overlay {
     position: fixed;
     top: 0;
@@ -356,9 +352,9 @@ body {
     opacity: 1;
 }
 
+/* --- Report Card --- */
 .report-card .stats-container {
     display: grid;
-    /* 3 columns on desktop */
     grid-template-columns: repeat(3, 1fr);
     gap: 1.5rem;
     margin-bottom: 2.5rem;
@@ -379,7 +375,6 @@ body {
     text-transform: uppercase;
 }
 
-/* Color the Pass/Fail numbers */
 .stat-box .stat-value.pass {
     color: var(--success-color);
 }
@@ -389,15 +384,36 @@ body {
 }
 
 .chart-container {
-    /* Set a max-width for the pie chart so it's not huge */
     max-width: 350px;
     margin: 0 auto;
 }
 
-/* --- Responsive for Report Card --- */
+/* --- Shift Bar Chart --- */
+.shift-card .chart-container {
+    min-height: 250px; 
+    position: relative;
+}
+
+/* --- Mobile Responsiveness --- */
 @media (max-width: 767px) {
+    .card-title {
+        font-size: 1.25rem;
+    }
+
+    /* Mobile Table */
+    #scans-table th,
+    #scans-table td {
+        white-space: nowrap;
+        padding: 0.75rem 0.9rem;
+        font-size: 0.875rem;
+    }
+    .result-badge {
+        padding: 0.3em 0.6em;
+        font-size: 0.8rem;
+    }
+    
+    /* Mobile Reports */
     .report-card .stats-container {
-        /* Stack the 3 boxes on mobile */
         grid-template-columns: 1fr;
         gap: 1rem;
         margin-bottom: 2rem;
@@ -405,12 +421,4 @@ body {
     .chart-container {
         max-width: 100%;
     }
-}
-
-/* --- THIS IS THE NEW FIX FOR THE LAYOUT --- */
-.left-column {
-    display: flex;
-    flex-direction: column;
-    /* Use the same gap as the main grid */
-    gap: 2.5rem; 
 }

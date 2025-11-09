@@ -72,6 +72,14 @@ def get_db_connection():
 
 
 # --- Pydantic Models ---
+class ShiftStat(BaseModel):
+    shift_name: str
+    scan_count: int
+
+# We'll return a list of these
+class ShiftStatsResponse(BaseModel):
+    shifts: List[ShiftStat]
+
 class StatsResponse(BaseModel):
     """Response model for scan statistics."""
     total_scans: int
@@ -161,6 +169,7 @@ def get_scans(db=Depends(get_db_connection)):
         raise HTTPException(
             status_code=500, detail=f"Database query error: {err}"
         )
+    
 
 @app.get("/api/stats", response_model=StatsResponse, summary="Get scan statistics")
 def get_stats(db=Depends(get_db_connection)):
@@ -193,6 +202,61 @@ def get_stats(db=Depends(get_db_connection)):
         raise HTTPException(
             status_code=500, detail=f"Database query error: {err}"
         )
+    
+
+@app.get("/api/stats/shifts", response_model=ShiftStatsResponse, summary="Get scan counts by shift for today")
+def get_shift_stats(db=Depends(get_db_connection)):
+    """
+    Retrieves scan counts grouped by 8-hour shifts for the current day.
+    """
+    
+    # Define the shift names
+    shift_names = {
+        "Shift 1 (12 AM - 8 AM)": 0,
+        "Shift 2 (8 AM - 4 PM)": 0,
+        "Shift 3 (4 PM - 12 AM)": 0
+    }
+    
+    # This query groups scans by hour, assigns a shift name,
+    # and counts the scans *only for today*.
+    query = """
+    SELECT 
+        CASE
+            WHEN HOUR(created_at) BETWEEN 0 AND 7 THEN 'Shift 1 (12 AM - 8 AM)'
+            WHEN HOUR(created_at) BETWEEN 8 AND 15 THEN 'Shift 2 (8 AM - 4 PM)'
+            ELSE 'Shift 3 (4 PM - 12 AM)'
+        END AS shift_name,
+        COUNT(*) AS scan_count
+    FROM scans
+    WHERE DATE(created_at) = CURDATE()
+    GROUP BY shift_name;
+    """
+    
+    try:
+        cursor = db.cursor(dictionary=True)
+        cursor.execute(query)
+        results = cursor.fetchall()
+        cursor.close()
+        
+        # Update the default counts with the results from the query
+        for row in results:
+            if row['shift_name'] in shift_names:
+                shift_names[row['shift_name']] = row['scan_count']
+        
+        # Format the output to match the Pydantic model
+        formatted_shifts = [
+            {"shift_name": name, "scan_count": count} for name, count in shift_names.items()
+        ]
+        
+        return {"shifts": formatted_shifts}
+        
+    except mysql.connector.Error as err:
+        raise HTTPException(
+            status_code=500, detail=f"Database query error: {err}"
+        )    
+
+
+
     
 # --- Run the server (for local testing) ---
 if __name__ == "__main__":

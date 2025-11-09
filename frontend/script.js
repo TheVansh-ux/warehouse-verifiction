@@ -1,6 +1,6 @@
 /**
  * Frontend JavaScript for the Warehouse Verification App.
- * Includes Audio Cues, Toasts, Screen Flash, and Stats Dashboard.
+ * Includes Audio Cues, Toasts, Screen Flash, Stats Dashboard, and Shift Chart.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -22,15 +22,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const scansTable = document.getElementById('scans-table');
     const noScansMessage = document.getElementById('no-scans-message');
     const flashOverlay = document.getElementById('flash-overlay');
-
-    // --- NEW: Stats Selectors ---
+    
+    // Stats (Pie Chart) Selectors
     const statTotalEl = document.getElementById('stat-total');
     const statPassedEl = document.getElementById('stat-passed');
     const statFailedEl = document.getElementById('stat-failed');
     const pieChartCanvas = document.getElementById('stats-pie-chart');
     
-    // --- NEW: Chart.js global variable ---
-    let statsPieChart = null; // We'll store the chart object here
+    // Shift (Bar Chart) Selectors
+    const barChartCanvas = document.getElementById('shift-bar-chart');
+    
+    // Chart.js global variables
+    let statsPieChart = null; 
+    let shiftBarChart = null;
 
     // --- Event Listeners ---
     scanForm.addEventListener('submit', handleVerificationSubmit);
@@ -66,8 +70,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             await submitScan(barcode1, barcode2);
-            // --- NEW: Refresh stats after a scan ---
+            // Refresh both charts after a scan
             await fetchAndRenderStats();
+            await fetchAndRenderShiftStats(); 
         } catch (error) {
             console.error('Submission failed:', error);
             showToast(`❌ Error: ${error.message}`, 'error');
@@ -113,9 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const cleanApiBaseUrl = API_BASE_URL.replace(/\/$/, "");
             const response = await fetch(`${cleanApiBaseUrl}/api/scans`);
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
+            if (!response.ok) throw new Error('Network response was not ok');
             const scans = await response.json();
             renderScansTable(scans);
         } catch (error) {
@@ -125,27 +128,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderScansTable(scans) {
+        // Ensure tbody exists before trying to clear it
+        if (!scansTbody) return; 
+        
         scansTbody.innerHTML = '';
         if (scans.length === 0) {
-            noScansMessage.style.display = 'flex';
-            scansTable.style.display = 'none';
+            if(noScansMessage) noScansMessage.style.display = 'flex';
+            if(scansTable) scansTable.style.display = 'none';
         } else {
-            noScansMessage.style.display = 'none';
-            scansTable.style.display = 'table';
+            if(noScansMessage) noScansMessage.style.display = 'none';
+            if(scansTable) scansTable.style.display = 'table';
+            
             scans.forEach(scan => {
                 const tr = document.createElement('tr');
                 const resultText = scan.result === 1 ? 'Pass' : 'Fail';
                 const resultIcon = scan.result === 1 ? '<i class="fa-solid fa-check"></i>' : '<i class="fa-solid fa-xmark"></i>';
                 const resultClass = scan.result === 1 ? 'result-match' : 'result-no-match';
-                
-                // This is the correct, working timestamp code
                 const timestamp = new Date(scan.created_at).toLocaleString('sv-SE', {
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit',
+                    year: 'numeric', month: '2-digit', day: '2-digit',
+                    hour: '2-digit', minute: '2-digit', second: '2-digit',
                     hour12: false
                 }).replace(' ', ' - ');
 
@@ -161,40 +162,34 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- NEW: Function to get and render stats ---
     async function fetchAndRenderStats() {
+        // Check if all elements exist before fetching
+        if (!statTotalEl || !statPassedEl || !statFailedEl || !pieChartCanvas) {
+            console.log("Stats elements not found, skipping render.");
+            return;
+        }
+        
         try {
             const cleanApiBaseUrl = API_BASE_URL.replace(/\/$/, "");
             const response = await fetch(`${cleanApiBaseUrl}/api/stats`);
-            
-            if (!response.ok) {
-                // This will catch 404 errors if the backend isn't updated
-                throw new Error(`Stats endpoint not found or failed (${response.status})`);
-            }
-
+            if (!response.ok) throw new Error(`Stats endpoint failed (${response.status})`);
             const stats = await response.json();
             
-            // Update the stat boxes
             statTotalEl.textContent = stats.total_scans;
             statPassedEl.textContent = stats.total_passed;
             statFailedEl.textContent = stats.total_failed;
             
-            // Render the pie chart
             renderPieChart(stats);
-            
         } catch (error) {
             console.error('Error fetching stats:', error);
-            // Show 'E' for Error if stats fail
             statTotalEl.textContent = 'E';
             statPassedEl.textContent = 'E';
             statFailedEl.textContent = 'E';
         }
     }
 
-    // --- NEW: Function to draw the pie chart ---
     function renderPieChart(stats) {
         const ctx = pieChartCanvas.getContext('2d');
-        
         const passColor = getComputedStyle(document.documentElement).getPropertyValue('--success-color');
         const failColor = getComputedStyle(document.documentElement).getPropertyValue('--error-color');
 
@@ -208,23 +203,77 @@ document.addEventListener('DOMContentLoaded', () => {
             }]
         };
 
-        if (statsPieChart) {
-            statsPieChart.destroy();
-        }
-
+        if (statsPieChart) statsPieChart.destroy();
         statsPieChart = new Chart(ctx, {
             type: 'pie',
             data: data,
+            options: { responsive: true, plugins: { legend: { position: 'top' } } },
+        });
+    }
+    
+    async function fetchAndRenderShiftStats() {
+        // Check if bar chart canvas exists
+        if (!barChartCanvas) {
+            console.log("Shift chart canvas not found, skipping render.");
+            return;
+        }
+
+        try {
+            const cleanApiBaseUrl = API_BASE_URL.replace(/\/$/, "");
+            const response = await fetch(`${cleanApiBaseUrl}/api/stats/shifts`);
+            if (!response.ok) throw new Error(`Shift stats endpoint failed (${response.status})`);
+            const data = await response.json();
+            
+            renderBarChart(data.shifts);
+        } catch (error) {
+            console.error('Error fetching shift stats:', error);
+        }
+    }
+    
+    function renderBarChart(shiftData) {
+        const ctx = barChartCanvas.getContext('2d');
+        const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary-color');
+        const borderColor = getComputedStyle(document.documentElement).getPropertyValue('--border-color');
+
+        const labels = shiftData.map(s => s.shift_name.replace(' (', '\n('));
+        const counts = shiftData.map(s => s.scan_count);
+
+        const data = {
+            labels: labels,
+            datasets: [{
+                label: 'Total Scans',
+                data: counts,
+                backgroundColor: primaryColor,
+                borderColor: primaryColor,
+                borderWidth: 1,
+                borderRadius: 4
+            }]
+        };
+
+        if (shiftBarChart) shiftBarChart.destroy();
+        shiftBarChart = new Chart(ctx, {
+            type: 'bar',
+            data: data,
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { stepSize: 1 },
+                        grid: { color: borderColor }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                },
                 plugins: {
-                    legend: { position: 'top' },
+                    legend: { display: false }
                 }
-            },
+            }
         });
     }
 
-    // --- This is your CORRECT, WORKING escapeHTML function ---
     function escapeHTML(str) {
         if (typeof str !== 'string') return '';
         return str.replace(/[&<>"']/g, (match) => {
@@ -233,49 +282,39 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- This is your CORRECT, WORKING showToast function ---
     function showToast(message, type = 'success') {
         const toastContainer = document.getElementById('toast-container');
+        if (!toastContainer) return;
         const toast = document.createElement('div');
         toast.classList.add('toast', `toast-${type}`);
         toast.innerHTML = message;
         toastContainer.appendChild(toast);
 
-        setTimeout(() => {
-            toast.classList.add('show');
-        }, 10);
-
+        setTimeout(() => toast.classList.add('show'), 10);
         setTimeout(() => {
             toast.classList.remove('show');
-            toast.addEventListener('transitionend', () => {
-                toast.remove();
-            }, { once: true });
+            toast.addEventListener('transitionend', () => toast.remove(), { once: true });
         }, 3000);
     }
     
-    // --- This is your CORRECT, WORKING triggerScreenFlash function ---
     function triggerScreenFlash(type) {
+        if (!flashOverlay) return;
         flashOverlay.classList.remove('flash-success', 'flash-fail', 'flash-active');
-
-        if (type === 'success') {
-            flashOverlay.classList.add('flash-success');
-        } else {
-            flashOverlay.classList.add('flash-fail');
-        }
-
+        const c = (type === 'success') ? 'flash-success' : 'flash-fail';
+        flashOverlay.classList.add(c);
         setTimeout(() => {
             flashOverlay.classList.add('flash-active');
-            setTimeout(() => {
-                flashOverlay.classList.remove('flash-active');
-            }, 150);
+            setTimeout(() => flashOverlay.classList.remove('flash-active'), 150);
         }, 10);
     }
 
     // --- Initialization ---
     function initializeApp() {
-        fetchScans(); // Load the table
-        fetchAndRenderStats(); // <-- NEW: Load the stats on page load
-        setInterval(fetchScans, REFRESH_INTERVAL_MS); // Keep table refreshing
+        fetchScans();
+        fetchAndRenderStats();
+        fetchAndRenderShiftStats();
+        
+        setInterval(fetchScans, REFRESH_INTERVAL_MS); 
     }
 
     initializeApp();

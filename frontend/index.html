@@ -21,8 +21,10 @@
             <p class="tagline">Enter barcode for your product verification process.</p>
         </header>
 
+        <!-- This is the corrected grid layout -->
         <div class="content-grid">
             
+            <!-- This div wraps all cards in the left column -->
             <div class="left-column">
                 
                 <section class="card scan-card">
@@ -63,7 +65,17 @@
                     </div>
                 </section>
                 
-            </div> <section class="card dashboard-card">
+                <section class="card shift-card">
+                    <h2 class="card-title">Today's Shift Activity</h2>
+                    <div class="chart-container">
+                        <canvas id="shift-bar-chart"></canvas>
+                    </div>
+                </section>
+                
+            </div> <!-- End of left-column -->
+            
+            <!-- The dashboard card is now on its own -->
+            <section class="card dashboard-card">
                 <h2 class="card-title">Recent Scan Activity</h2>
                 <div id="scans-table-container">
                     <table id="scans-table">
@@ -85,7 +97,11 @@
                 </div>
             </section>
             
-        </div> </div> <script src="script.js" defer></script>
+        </div> <!-- End of content-grid -->
+
+    </div> <!-- End of main-container -->
+    
+    <script src="script.js" defer></script>
     <div id="toast-container"></div>
 </body>
 </html>
