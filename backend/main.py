@@ -72,6 +72,12 @@ def get_db_connection():
 
 
 # --- Pydantic Models ---
+class StatsResponse(BaseModel):
+    """Response model for scan statistics."""
+    total_scans: int
+    total_passed: int
+    total_failed: int
+
 class ScanRequest(BaseModel):
     """Request model for submitting a new scan."""
     barcode1: str
@@ -156,7 +162,38 @@ def get_scans(db=Depends(get_db_connection)):
             status_code=500, detail=f"Database query error: {err}"
         )
 
-
+@app.get("/api/stats", response_model=StatsResponse, summary="Get scan statistics")
+def get_stats(db=Depends(get_db_connection)):
+    """
+    Retrieves a count of total, passed, and failed scans.
+    """
+    try:
+        cursor = db.cursor(dictionary=True)
+        
+        # Get total scans
+        cursor.execute("SELECT COUNT(*) as total FROM scans")
+        total_scans = cursor.fetchone()['total']
+        
+        # Get total passed (result = 1)
+        cursor.execute("SELECT COUNT(*) as total FROM scans WHERE result = 1")
+        total_passed = cursor.fetchone()['total']
+        
+        # Get total failed (result = 0)
+        cursor.execute("SELECT COUNT(*) as total FROM scans WHERE result = 0")
+        total_failed = cursor.fetchone()['total']
+        
+        cursor.close()
+        
+        return {
+            "total_scans": total_scans,
+            "total_passed": total_passed,
+            "total_failed": total_failed
+        }
+    except mysql.connector.Error as err:
+        raise HTTPException(
+            status_code=500, detail=f"Database query error: {err}"
+        )
+    
 # --- Run the server (for local testing) ---
 if __name__ == "__main__":
     # Create a local .env file with your local DB credentials

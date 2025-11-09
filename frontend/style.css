@@ -353,3 +353,54 @@ body {
 .flash-active {
     opacity: 1;
 }
+
+.report-card .stats-container {
+    display: grid;
+    /* 3 columns on desktop */
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+    text-align: center;
+}
+
+.stat-box .stat-value {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--text-color-dark);
+    display: block;
+    line-height: 1.2;
+}
+
+.stat-box .stat-label {
+    font-size: 0.9rem;
+    color: var(--text-color-medium);
+    text-transform: uppercase;
+}
+
+/* Color the Pass/Fail numbers */
+.stat-box .stat-value.pass {
+    color: var(--success-color);
+}
+
+.stat-box .stat-value.fail {
+    color: var(--error-color);
+}
+
+.chart-container {
+    /* Set a max-width for the pie chart so it's not huge */
+    max-width: 350px;
+    margin: 0 auto;
+}
+
+/* --- Responsive for Report Card --- */
+@media (max-width: 767px) {
+    .report-card .stats-container {
+        /* Stack the 3 boxes on mobile */
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    .chart-container {
+        max-width: 100%;
+    }
+}

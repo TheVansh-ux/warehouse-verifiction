@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div id="flash-overlay"></div>
@@ -39,7 +40,28 @@
                     </button>
                 </form>
             </section>
-
+<div class="content-grid">
+    
+    <section class="card report-card">
+        <h2 class="card-title">Reports</h2>
+        <div class="stats-container">
+            <div class="stat-box">
+                <span class="stat-value" id="stat-total">0</span>
+                <span class="stat-label">Total Scans</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-value pass" id="stat-passed">0</span>
+                <span class="stat-label">Passed</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-value fail" id="stat-failed">0</span>
+                <span class="stat-label">Failed</span>
+            </div>
+        </div>
+        <div class="chart-container">
+            <canvas id="stats-pie-chart"></canvas>
+        </div>
+    </section>
             <section class="card dashboard-card">
                 <h2 class="card-title">Recent Scan Activity</h2>
                 <div id="scans-table-container">
