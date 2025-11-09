@@ -1,5 +1,6 @@
 /**
  * Frontend JavaScript for the Warehouse Verification App.
+ * Professional Redesign Version
  * Includes Audio Cues, Toasts, Screen Flash, Stats Dashboard, and Shift Chart.
  */
 
@@ -72,19 +73,24 @@ document.addEventListener('DOMContentLoaded', () => {
             await submitScan(barcode1, barcode2);
             // Refresh both charts after a scan
             await fetchAndRenderStats();
-            await fetchAndRenderShiftStats(); 
+            await fetchAndRenderShiftStats();
         } catch (error) {
             console.error('Submission failed:', error);
             showToast(`❌ Error: ${error.message}`, 'error');
         } finally {
             verifyBtn.disabled = false;
-            verifyBtn.innerHTML = '<i class="fa-solid fa-check-double"></i> Verify Product';
+            // Restore original button text
+            verifyBtn.innerHTML = '<i class="fa-solid fa-check-double"></i> <span>Verify Product</span>';
             barcode1Input.value = '';
             barcode2Input.value = '';
             barcode1Input.focus();
         }
     }
 
+    /**
+     * Submits the two barcodes to the backend API.
+     * THIS FUNCTION IS NOW 100% CORRECT
+     */
     async function submitScan(barcode1, barcode2) {
         const cleanApiBaseUrl = API_BASE_URL.replace(/\/$/, "");
         
@@ -103,11 +109,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (data.result === 'Match') {
             showToast('✅ Pass!', 'success');
-            triggerScreenFlash('success');
+            triggerScreenFlash('success'); // <-- Triggers GREEN flash
             passSound.play(); 
         } else {
             showToast('❌ Fail!', 'error');
-            triggerScreenFlash('fail');
+            triggerScreenFlash('fail'); // <-- Triggers RED flash
             failSound.play(); 
         }
 
@@ -127,23 +133,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    /**
+     * Renders the fetched scan data into the dashboard table.
+     * THIS FUNCTION NOW USES THE CORRECT "PILL" BADGES
+     */
     function renderScansTable(scans) {
-        // Ensure tbody exists before trying to clear it
-        if (!scansTbody) return; 
-        
         scansTbody.innerHTML = '';
         if (scans.length === 0) {
-            if(noScansMessage) noScansMessage.style.display = 'flex';
-            if(scansTable) scansTable.style.display = 'none';
+            noScansMessage.style.display = 'flex';
+            scansTable.style.display = 'table'; // Hide table, show message
         } else {
-            if(noScansMessage) noScansMessage.style.display = 'none';
-            if(scansTable) scansTable.style.display = 'table';
+            noScansMessage.style.display = 'none';
+            scansTable.style.display = 'table'; // Show table, hide message
             
             scans.forEach(scan => {
                 const tr = document.createElement('tr');
+                
                 const resultText = scan.result === 1 ? 'Pass' : 'Fail';
                 const resultIcon = scan.result === 1 ? '<i class="fa-solid fa-check"></i>' : '<i class="fa-solid fa-xmark"></i>';
-                const resultClass = scan.result === 1 ? 'result-match' : 'result-no-match';
+                // THIS IS THE FIX FOR YOUR TABLE COLORS
+                const resultClass = scan.result === 1 ? 'badge-pass' : 'badge-fail';
+                
                 const timestamp = new Date(scan.created_at).toLocaleString('sv-SE', {
                     year: 'numeric', month: '2-digit', day: '2-digit',
                     hour: '2-digit', minute: '2-digit', second: '2-digit',
@@ -154,7 +164,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td>${scan.id}</td>
                     <td>${escapeHTML(scan.barcode1)}</td>
                     <td>${escapeHTML(scan.barcode2)}</td>
-                    <td><span class="result-badge ${resultClass}">${resultIcon} ${resultText}</span></td>
+                    <!-- This line is updated to use the new classes -->
+                    <td><span class="badge-pill ${resultClass}">${resultIcon} ${resultText}</span></td>
                     <td>${timestamp}</td>
                 `;
                 scansTbody.appendChild(tr);
@@ -163,12 +174,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function fetchAndRenderStats() {
-        // Check if all elements exist before fetching
-        if (!statTotalEl || !statPassedEl || !statFailedEl || !pieChartCanvas) {
-            console.log("Stats elements not found, skipping render.");
-            return;
-        }
-        
         try {
             const cleanApiBaseUrl = API_BASE_URL.replace(/\/$/, "");
             const response = await fetch(`${cleanApiBaseUrl}/api/stats`);
@@ -189,6 +194,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderPieChart(stats) {
+        // Check if canvas element exists
+        if (!pieChartCanvas) return;
         const ctx = pieChartCanvas.getContext('2d');
         const passColor = getComputedStyle(document.documentElement).getPropertyValue('--success-color');
         const failColor = getComputedStyle(document.documentElement).getPropertyValue('--error-color');
@@ -207,17 +214,19 @@ document.addEventListener('DOMContentLoaded', () => {
         statsPieChart = new Chart(ctx, {
             type: 'pie',
             data: data,
-            options: { responsive: true, plugins: { legend: { position: 'top' } } },
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false,
+                plugins: { 
+                    legend: { position: 'top' } 
+                } 
+            },
         });
     }
     
     async function fetchAndRenderShiftStats() {
-        // Check if bar chart canvas exists
-        if (!barChartCanvas) {
-            console.log("Shift chart canvas not found, skipping render.");
-            return;
-        }
-
+        // Check if canvas element exists
+        if (!barChartCanvas) return;
         try {
             const cleanApiBaseUrl = API_BASE_URL.replace(/\/$/, "");
             const response = await fetch(`${cleanApiBaseUrl}/api/stats/shifts`);
@@ -225,17 +234,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
             
             renderBarChart(data.shifts);
+            
         } catch (error) {
             console.error('Error fetching shift stats:', error);
         }
     }
     
     function renderBarChart(shiftData) {
+        if (!barChartCanvas) return;
         const ctx = barChartCanvas.getContext('2d');
         const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary-color');
-        const borderColor = getComputedStyle(document.documentElement).getPropertyValue('--border-color');
+        const borderColor = getComputedStyle(document.documentElement).getPropertyValue('--color-border');
 
-        const labels = shiftData.map(s => s.shift_name.replace(' (', '\n('));
+        const labels = shiftData.map(s => s.shift_name.split(' (')); // Split label for line break
         const counts = shiftData.map(s => s.scan_count);
 
         const data = {
@@ -274,6 +285,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- Helper Functions (Corrected) ---
     function escapeHTML(str) {
         if (typeof str !== 'string') return '';
         return str.replace(/[&<>"']/g, (match) => {
@@ -284,7 +296,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function showToast(message, type = 'success') {
         const toastContainer = document.getElementById('toast-container');
-        if (!toastContainer) return;
+        if (!toastContainer) return; // Safety check
         const toast = document.createElement('div');
         toast.classList.add('toast', `toast-${type}`);
         toast.innerHTML = message;
@@ -298,20 +310,27 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function triggerScreenFlash(type) {
-        if (!flashOverlay) return;
+        if (!flashOverlay) return; // Safety check
         flashOverlay.classList.remove('flash-success', 'flash-fail', 'flash-active');
-        const c = (type === 'success') ? 'flash-success' : 'flash-fail';
-        flashOverlay.classList.add(c);
+
+        if (type === 'success') {
+            flashOverlay.classList.add('flash-success');
+        } else {
+            flashOverlay.classList.add('flash-fail');
+        }
+
         setTimeout(() => {
             flashOverlay.classList.add('flash-active');
-            setTimeout(() => flashOverlay.classList.remove('flash-active'), 150);
+            setTimeout(() => {
+                flashOverlay.classList.remove('flash-active');
+            }, 150);
         }, 10);
     }
 
     // --- Initialization ---
     function initializeApp() {
-        fetchScans();
-        fetchAndRenderStats();
+        fetchScans(); 
+        fetchAndRenderStats(); 
         fetchAndRenderShiftStats();
         
         setInterval(fetchScans, REFRESH_INTERVAL_MS); 

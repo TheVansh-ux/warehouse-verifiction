@@ -345,7 +345,7 @@ body {
     background-color: var(--color-background);
 }
 
-/* NEW: Pill Badges */
+/* --- THIS FIXES YOUR TABLE COLORS --- */
 .badge-pill {
     padding: 0.2rem 0.6rem;
     border-radius: 9999px;
@@ -402,7 +402,7 @@ body {
     }
 }
 
-/* --- Toasts & Flash (Unchanged, but confirmed) --- */
+/* --- Toasts & Flash --- */
 #toast-container {
     position: fixed;
     bottom: 2rem;
@@ -433,6 +433,7 @@ body {
 .toast.toast-success { border-left-color: var(--success-color); }
 .toast.toast-error { border-left-color: var(--error-color); }
 
+/* --- THIS FIXES YOUR FLASH BUG --- */
 #flash-overlay {
     position: fixed;
     top: 0;
@@ -444,6 +445,7 @@ body {
     pointer-events: none;
     transition: opacity 0.1s ease-in-out;
 }
+/* These rules tell the flash which color to be */
 .flash-success { background-color: var(--success-bg); }
 .flash-fail { background-color: var(--error-bg); }
 .flash-active { opacity: 0.5; }
@@ -451,13 +453,11 @@ body {
 /* --- 6. Mobile Responsive --- */
 @media (max-width: 767px) {
     body {
-        /* On mobile, stack sidebar on top */
         display: flex;
         flex-direction: column;
         height: auto;
     }
     .sidebar {
-        /* Make sidebar a horizontal bar */
         width: 100%;
         height: 60px;
         flex-direction: row;
@@ -484,11 +484,9 @@ body {
     .page-header .tagline { font-size: 1rem; }
     
     .content-grid {
-        /* Already 1 column, but make sure the dashboard is on top */
         grid-template-columns: 1fr;
     }
     .dashboard-card {
-        /* On mobile, put the big table *last* */
         order: 99;
     }
     .stats-container {
