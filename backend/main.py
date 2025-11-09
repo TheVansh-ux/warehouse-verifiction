@@ -39,7 +39,7 @@ try:
     # Create a connection pool instead of single connections
     cnx_pool = mysql.connector.pooling.MySQLConnectionPool(
         pool_name="barcode_pool",
-        pool_size=1,
+        pool_size=1, # Set to 1 for free database plans
         **DB_CONFIG
     )
     print("Database connection pool created successfully.")
@@ -76,7 +76,6 @@ class ShiftStat(BaseModel):
     shift_name: str
     scan_count: int
 
-# We'll return a list of these
 class ShiftStatsResponse(BaseModel):
     shifts: List[ShiftStat]
 
@@ -132,7 +131,7 @@ def create_scan(
 
     # Compare barcodes
     result = 1 if scan.barcode1 == scan.barcode2 else 0
-    result_text = "Match" if result == 1 else "No Match"
+    result_text = "Match" # We use Pass/Fail on frontend, but backend can just say Match
 
     query = "INSERT INTO scans (barcode1, barcode2, result) VALUES (%s, %s, %s)"
     
@@ -208,6 +207,7 @@ def get_stats(db=Depends(get_db_connection)):
 def get_shift_stats(db=Depends(get_db_connection)):
     """
     Retrieves scan counts grouped by 8-hour shifts for the current day.
+    This query is corrected for IST (UTC+5:30).
     """
     
     # Define the shift names
@@ -217,18 +217,19 @@ def get_shift_stats(db=Depends(get_db_connection)):
         "Shift 3 (4 PM - 12 AM)": 0
     }
     
-    # This query groups scans by hour, assigns a shift name,
-    # and counts the scans *only for today*.
+    # This query now converts time to IST (UTC+5:30) before grouping
     query = """
     SELECT 
         CASE
-            WHEN HOUR(created_at) BETWEEN 0 AND 7 THEN 'Shift 1 (12 AM - 8 AM)'
-            WHEN HOUR(created_at) BETWEEN 8 AND 15 THEN 'Shift 2 (8 AM - 4 PM)'
+            -- Add 5.5 hours to convert from UTC to IST
+            WHEN HOUR(created_at + INTERVAL 5 HOUR + INTERVAL 30 MINUTE) BETWEEN 0 AND 7 THEN 'Shift 1 (12 AM - 8 AM)'
+            WHEN HOUR(created_at + INTERVAL 5 HOUR + INTERVAL 30 MINUTE) BETWEEN 8 AND 15 THEN 'Shift 2 (8 AM - 4 PM)'
             ELSE 'Shift 3 (4 PM - 12 AM)'
         END AS shift_name,
         COUNT(*) AS scan_count
     FROM scans
-    WHERE DATE(created_at) = CURDATE()
+    -- Ensure we are also checking "today" in IST
+    WHERE DATE(created_at + INTERVAL 5 HOUR + INTERVAL 30 MINUTE) = DATE(NOW() + INTERVAL 5 HOUR + INTERVAL 30 MINUTE)
     GROUP BY shift_name;
     """
     
@@ -253,9 +254,7 @@ def get_shift_stats(db=Depends(get_db_connection)):
     except mysql.connector.Error as err:
         raise HTTPException(
             status_code=500, detail=f"Database query error: {err}"
-        )    
-
-
+        ) 
 
     
 # --- Run the server (for local testing) ---
