@@ -131,7 +131,7 @@ def create_scan(
 
     # Compare barcodes
     result = 1 if scan.barcode1 == scan.barcode2 else 0
-    result_text = "Match" # We use Pass/Fail on frontend, but backend can just say Match
+    result_text = "Match" if result == 1 else "No Match"
 
     query = "INSERT INTO scans (barcode1, barcode2, result) VALUES (%s, %s, %s)"
     

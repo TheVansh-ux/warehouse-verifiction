@@ -107,13 +107,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const data = await response.json();
 
+        // --- THIS IS THE FIX FOR YOUR LOGIC BUG ---
+        // It correctly checks for "Match" or "No Match"
         if (data.result === 'Match') {
             showToast('✅ Pass!', 'success');
-            triggerScreenFlash('success'); // <-- Triggers GREEN flash
+            triggerScreenFlash('success'); // Triggers GREEN flash
             passSound.play(); 
         } else {
+            // This 'else' block will now run correctly
             showToast('❌ Fail!', 'error');
-            triggerScreenFlash('fail'); // <-- Triggers RED flash
+            triggerScreenFlash('fail'); // Triggers RED flash
             failSound.play(); 
         }
 
@@ -141,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
         scansTbody.innerHTML = '';
         if (scans.length === 0) {
             noScansMessage.style.display = 'flex';
-            scansTable.style.display = 'table'; // Hide table, show message
+            scansTable.style.display = 'none'; // Hide table, show message
         } else {
             noScansMessage.style.display = 'none';
             scansTable.style.display = 'table'; // Show table, hide message
@@ -151,7 +154,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 const resultText = scan.result === 1 ? 'Pass' : 'Fail';
                 const resultIcon = scan.result === 1 ? '<i class="fa-solid fa-check"></i>' : '<i class="fa-solid fa-xmark"></i>';
-                // THIS IS THE FIX FOR YOUR TABLE COLORS
+                
+                // --- THIS IS THE FIX FOR YOUR TABLE COLORS ---
+                // It uses the new .badge-pass and .badge-fail classes
                 const resultClass = scan.result === 1 ? 'badge-pass' : 'badge-fail';
                 
                 const timestamp = new Date(scan.created_at).toLocaleString('sv-SE', {
@@ -194,8 +199,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderPieChart(stats) {
-        // Check if canvas element exists
-        if (!pieChartCanvas) return;
+        if (!pieChartCanvas) return; // Safety check
         const ctx = pieChartCanvas.getContext('2d');
         const passColor = getComputedStyle(document.documentElement).getPropertyValue('--success-color');
         const failColor = getComputedStyle(document.documentElement).getPropertyValue('--error-color');
@@ -225,8 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     async function fetchAndRenderShiftStats() {
-        // Check if canvas element exists
-        if (!barChartCanvas) return;
+        if (!barChartCanvas) return; // Safety check
         try {
             const cleanApiBaseUrl = API_BASE_URL.replace(/\/$/, "");
             const response = await fetch(`${cleanApiBaseUrl}/api/stats/shifts`);
@@ -296,7 +299,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function showToast(message, type = 'success') {
         const toastContainer = document.getElementById('toast-container');
-        if (!toastContainer) return; // Safety check
+        if (!toastContainer) return; 
         const toast = document.createElement('div');
         toast.classList.add('toast', `toast-${type}`);
         toast.innerHTML = message;
@@ -310,7 +313,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function triggerScreenFlash(type) {
-        if (!flashOverlay) return; // Safety check
+        if (!flashOverlay) return; 
         flashOverlay.classList.remove('flash-success', 'flash-fail', 'flash-active');
 
         if (type === 'success') {
