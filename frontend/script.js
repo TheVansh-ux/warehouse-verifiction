@@ -137,7 +137,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 const resultText = scan.result === 1 ? 'Pass' : 'Fail';
                 const resultIcon = scan.result === 1 ? '<i class="fa-solid fa-check"></i>' : '<i class="fa-solid fa-xmark"></i>';
                 const resultClass = scan.result === 1 ? 'result-match' : 'result-no-match';
-                const timestamp = new Date(scan.created_at).toLocaleString('sv-SE').replace(' ', ' - ');
+                
+                // This is the correct, working timestamp code
+                const timestamp = new Date(scan.created_at).toLocaleString('sv-SE', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false
+                }).replace(' ', ' - ');
+
                 tr.innerHTML = `
                     <td>${scan.id}</td>
                     <td>${escapeHTML(scan.barcode1)}</td>
@@ -155,9 +166,12 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const cleanApiBaseUrl = API_BASE_URL.replace(/\/$/, "");
             const response = await fetch(`${cleanApiBaseUrl}/api/stats`);
+            
             if (!response.ok) {
-                throw new Error('Network response was not ok');
+                // This will catch 404 errors if the backend isn't updated
+                throw new Error(`Stats endpoint not found or failed (${response.status})`);
             }
+
             const stats = await response.json();
             
             // Update the stat boxes
@@ -170,6 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
         } catch (error) {
             console.error('Error fetching stats:', error);
+            // Show 'E' for Error if stats fail
             statTotalEl.textContent = 'E';
             statPassedEl.textContent = 'E';
             statFailedEl.textContent = 'E';
@@ -180,85 +195,79 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderPieChart(stats) {
         const ctx = pieChartCanvas.getContext('2d');
         
-        // Get CSS colors for the chart
         const passColor = getComputedStyle(document.documentElement).getPropertyValue('--success-color');
         const failColor = getComputedStyle(document.documentElement).getPropertyValue('--error-color');
 
         const data = {
-            labels: [
-                'Passed',
-                'Failed'
-            ],
+            labels: [ 'Passed', 'Failed' ],
             datasets: [{
                 label: 'Scan Stats',
                 data: [stats.total_passed, stats.total_failed],
-                backgroundColor: [
-                    passColor,
-                    failColor
-                ],
+                backgroundColor: [ passColor, failColor ],
                 hoverOffset: 4
             }]
         };
 
-        // If the chart already exists, destroy it before drawing a new one
         if (statsPieChart) {
             statsPieChart.destroy();
         }
 
-        // Create the new chart
         statsPieChart = new Chart(ctx, {
             type: 'pie',
             data: data,
             options: {
                 responsive: true,
                 plugins: {
-                    legend: {
-                        position: 'top',
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.label || '';
-                                if (label) {
-                                    label += ': ';
-                                }
-                                if (context.parsed !== null) {
-                                    label += context.parsed;
-                                }
-                                return label;
-                            }
-                        }
-                    }
+                    legend: { position: 'top' },
                 }
             },
         });
     }
 
+    // --- This is your CORRECT, WORKING escapeHTML function ---
     function escapeHTML(str) {
         if (typeof str !== 'string') return '';
-        return str.replace(/[&<>"']/g, (m) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+        return str.replace(/[&<>"']/g, (match) => {
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+            return map[match];
+        });
     }
 
+    // --- This is your CORRECT, WORKING showToast function ---
     function showToast(message, type = 'success') {
-        const tC = document.getElementById('toast-container');
-        const t = document.createElement('div');
-        t.classList.add('toast', `toast-${type}`);
-        t.innerHTML = message;
-        tC.appendChild(t);
-        setTimeout(() => t.classList.add('show'), 10);
+        const toastContainer = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.classList.add('toast', `toast-${type}`);
+        toast.innerHTML = message;
+        toastContainer.appendChild(toast);
+
         setTimeout(() => {
-            t.classList.remove('show');
-            t.addEventListener('transitionend', () => t.remove(), { once: true });
+            toast.classList.add('show');
+        }, 10);
+
+        setTimeout(() => {
+            toast.classList.remove('show');
+            toast.addEventListener('transitionend', () => {
+                toast.remove();
+            }, { once: true });
         }, 3000);
     }
     
+    // --- This is your CORRECT, WORKING triggerScreenFlash function ---
     function triggerScreenFlash(type) {
         flashOverlay.classList.remove('flash-success', 'flash-fail', 'flash-active');
-        const c = (type === 'success') ? 'flash-success' : 'flash-fail';
-        flashOverlay.classList.add(c);
+
+        if (type === 'success') {
+            flashOverlay.classList.add('flash-success');
+        } else {
+            flashOverlay.classList.add('flash-fail');
+        }
+
         setTimeout(() => {
             flashOverlay.classList.add('flash-active');
-            setTimeout(() => flashOverlay.classList.remove('flash-active'), 150);
+            setTimeout(() => {
+                flashOverlay.classList.remove('flash-active');
+            }, 150);
         }, 10);
     }
 
