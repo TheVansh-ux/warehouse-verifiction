@@ -1,5 +1,3 @@
-<!-- This is a single-line comment -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -24,45 +22,48 @@
         </header>
 
         <div class="content-grid">
-            <section class="card scan-card">
-                <h2 class="card-title">New Scan Verification</h2>
-                <form id="scan-form">
-                    <div class="form-group">
-                        <label for="barcode1"><i class="fa-solid fa-barcode"></i> Barcode 1 (Original)</label>
-                        <input type="text" id="barcode1" class="barcode-input" placeholder="Scan or enter first barcode..." required autofocus>
+            
+            <div class="left-column">
+                
+                <section class="card scan-card">
+                    <h2 class="card-title">New Scan Verification</h2>
+                    <form id="scan-form">
+                        <div class="form-group">
+                            <label for="barcode1"><i class="fa-solid fa-barcode"></i> Barcode 1 (Original)</label>
+                            <input type="text" id="barcode1" class="barcode-input" placeholder="Scan or enter first barcode..." required autofocus>
+                        </div>
+                        <div class="form-group">
+                            <label for="barcode2"><i class="fa-solid fa-barcode"></i> Barcode 2 (To Verify)</label>
+                            <input type="text" id="barcode2" class="barcode-input" placeholder="Scan or enter second barcode..." required>
+                        </div>
+                        <button type="submit" id="verify-btn" class="primary-btn">
+                            <i class="fa-solid fa-check-double"></i> Verify Product
+                        </button>
+                    </form>
+                </section>
+
+                <section class="card report-card">
+                    <h2 class="card-title">Reports</h2>
+                    <div class="stats-container">
+                        <div class="stat-box">
+                            <span class="stat-value" id="stat-total">0</span>
+                            <span class="stat-label">Total Scans</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-value pass" id="stat-passed">0</span>
+                            <span class="stat-label">Passed</span>
+                        </div>
+                        <div class="stat-box">
+                            <span class="stat-value fail" id="stat-failed">0</span>
+                            <span class="stat-label">Failed</span>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="barcode2"><i class="fa-solid fa-barcode"></i> Barcode 2 (To Verify)</label>
-                        <input type="text" id="barcode2" class="barcode-input" placeholder="Scan or enter second barcode..." required>
+                    <div class="chart-container">
+                        <canvas id="stats-pie-chart"></canvas>
                     </div>
-                    <button type="submit" id="verify-btn" class="primary-btn">
-                        <i class="fa-solid fa-check-double"></i> Verify Product
-                    </button>
-                </form>
-            </section>
-<div class="content-grid">
-    
-    <section class="card report-card">
-        <h2 class="card-title">Reports</h2>
-        <div class="stats-container">
-            <div class="stat-box">
-                <span class="stat-value" id="stat-total">0</span>
-                <span class="stat-label">Total Scans</span>
-            </div>
-            <div class="stat-box">
-                <span class="stat-value pass" id="stat-passed">0</span>
-                <span class="stat-label">Passed</span>
-            </div>
-            <div class="stat-box">
-                <span class="stat-value fail" id="stat-failed">0</span>
-                <span class="stat-label">Failed</span>
-            </div>
-        </div>
-        <div class="chart-container">
-            <canvas id="stats-pie-chart"></canvas>
-        </div>
-    </section>
-            <section class="card dashboard-card">
+                </section>
+                
+            </div> <section class="card dashboard-card">
                 <h2 class="card-title">Recent Scan Activity</h2>
                 <div id="scans-table-container">
                     <table id="scans-table">
@@ -76,19 +77,15 @@
                             </tr>
                         </thead>
                         <tbody id="scans-tbody">
-                            </tbody>
+                        </tbody>
                     </table>
                     <p id="no-scans-message" class="empty-state">
                         <i class="fa-solid fa-inbox"></i> No scans recorded yet. Verify an item to see results.
                     </p>
                 </div>
             </section>
-        </div>
-    </div>
-    
-
-    <script src="script.js" defer></script>
-
+            
+        </div> </div> <script src="script.js" defer></script>
     <div id="toast-container"></div>
 </body>
 </html>

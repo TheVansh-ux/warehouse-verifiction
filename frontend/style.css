@@ -1,3 +1,4 @@
+/* --- Global Styles & Variables --- */
 :root {
     --primary-color: #3B82F6; 
     --primary-dark: #2563EB;
@@ -33,6 +34,7 @@ body {
     padding: 2rem;
 }
 
+/* --- Main Container & Header --- */
 .main-container {
     max-width: 1200px;
     width: 100%;
@@ -403,4 +405,12 @@ body {
     .chart-container {
         max-width: 100%;
     }
+}
+
+/* --- THIS IS THE NEW FIX FOR THE LAYOUT --- */
+.left-column {
+    display: flex;
+    flex-direction: column;
+    /* Use the same gap as the main grid */
+    gap: 2.5rem; 
 }
